@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Simple SEO Checker</title>
+</head>
+<body>
+  <h1>Simple SEO Checker</h1>
+  <input type="text" id="urlInput" placeholder="Enter website URL" style="width: 300px;" />
+  <button onclick="checkSEO()">Check SEO</button>
+  
+  <div id="result" style="margin-top: 20px;"></div>
+
+  <script>
+    async function checkSEO() {
+      const url = document.getElementById('urlInput').value;
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = "Checking...";
+
+      try {
+        const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(url);
+        const response = await fetch(proxyUrl);
+        const data = await response.json();
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(data.contents, 'text/html');
+
+        const title = doc.querySelector('title')?.innerText || 'No title found';
+        const meta = doc.querySelector('meta[name="description"]')?.getAttribute('content') || 'No meta description found';
+
+        resultDiv.innerHTML = `
+          <strong>Title:</strong> ${title}<br>
+          <strong>Meta Description:</strong> ${meta}
+        `;
+      } catch (error) {
+        resultDiv.innerHTML = 'Error: Unable to fetch or parse website.';
+      }
+    }
+  </script>
+</body>
+</html>
